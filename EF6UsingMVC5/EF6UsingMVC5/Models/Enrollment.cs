@@ -1,4 +1,6 @@
-﻿namespace EF6UsingMVC5.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EF6UsingMVC5.Models
 {
     public enum Grade
     {
@@ -15,6 +17,8 @@
         //Foreign Keys
         public int CourseID { get; set; }
         public int StudentID { get; set; }
+
+        [DisplayFormat(NullDisplayText = "No grade")]
         public Grade? Grade { get; set; }
 
         #endregion

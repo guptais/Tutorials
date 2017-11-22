@@ -1,0 +1,10 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" x:Class="Q550084.MainWindow"
+        Title="MainWindow" Height="239.661" Width="515.508">
+    <Grid>
+        <Button Content="Send message" HorizontalAlignment="Left" Margin="293,90,0,0" VerticalAlignment="Top" Width="119" Command="{Binding SendMessageCommand}" CommandParameter="{Binding ElementName=textEdit1, Path=EditValue}"/>
+        <dxe:TextEdit HorizontalAlignment="Left" Margin="100,88,0,0" VerticalAlignment="Top" Width="150" Name="textEdit1"/>
+    </Grid>
+</Window>

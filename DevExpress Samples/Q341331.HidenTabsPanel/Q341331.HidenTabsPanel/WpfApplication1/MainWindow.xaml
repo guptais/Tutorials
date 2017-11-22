@@ -1,0 +1,702 @@
+﻿<Window x:Class="WpfApplication1.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking" 
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
+    xmlns:dxcore="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxgt="http://schemas.devexpress.com/winfx/2008/xaml/grid/themekeys"
+        
+        xmlns:dxt="clr-namespace:DevExpress.Xpf.Docking.ThemeKeys;assembly=DevExpress.Xpf.Docking.v17.1"
+        xmlns:ve="clr-namespace:DevExpress.Xpf.Docking.VisualElements;assembly=DevExpress.Xpf.Docking.v17.1"
+    x:Name="mainWindow" WindowState="Maximized">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+
+            <ControlTemplate x:Key="{dxt:TabbedPaneElementsThemeKey ResourceKey=TabContainerTemplate, ThemeName=Office2007Blue}" TargetType="ve:PanelTabContainer">
+                <Grid Width="Auto" Height="Auto" Background="Transparent" ve:DockPane.HitTestType="Bounds">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ContentPresenter x:Name="PART_SelectedPage" Width="Auto" Height="Auto" Grid.Row="0" Content="{TemplateBinding SelectedContent}" ContentTemplate="{TemplateBinding SelectedContentTemplate}" ve:DockPane.HitTestType="Content" />
+                    <Border Margin="1,0,1,1" Visibility="Collapsed"
+                            x:Name="PageHeaders" Grid.Row="1" Background="#FFA8BDD4" BorderBrush="#FF8EA7C4" BorderThickness="1,0,1,1" Padding="0,1,0,0">
+                        <Border Width="Auto" Height="Auto" Background="#FFB8CFE9" Padding="2,0,2,2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ItemsPresenter x:Name="PART_HeadersPanelPresenter" Width="Auto" Height="Auto" />
+                                <ve:BaseControlBoxControl x:Name="PART_ControlBox" LayoutItem="{Binding}" Grid.Column="1" Margin="0,4,4,2" ButtonWidth="16" ButtonHeight="16" />
+                            </Grid>
+                        </Border>
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+
+            <DataTemplate x:Key="gridRowTemplate">
+                <Border x:Name="rowBorder">
+                    <ContentPresenter ContentTemplate="{DynamicResource {dxgt:GridRowThemeKey ResourceKey=DataRowTemplate}}" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding DataContext.Missed}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="LightSalmon"></Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding DataContext.Moved}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="LightGreen"></Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding DataContext.Warn}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="Khaki"></Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding DataContext.WarnMoved}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="Orange"></Setter>
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate x:Key="historyGridRowTemplate">
+                <Border x:Name="rowBorder">
+                    <ContentPresenter ContentTemplate="{DynamicResource {dxgt:GridRowThemeKey ResourceKey=DataRowTemplate}}" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding DataContext.bln_Rescheduled}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="Thistle"></Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding DataContext.bln_Missed}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="LightSalmon"></Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding DataContext.bln_Moved}" Value="True">
+                        <Setter TargetName="rowBorder" Property="Background" Value="LightGreen"></Setter>
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibleConverter"></BooleanToVisibilityConverter>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <!--Tool bar -->
+        <dxb:BarManager CreateStandardLayout="True" Grid.Row="0" dxcore:ThemeManager.ThemeName="Office2007Blue" AllowCustomization="False" 
+                        AllowQuickCustomization="False">
+            <!--AllowDrop="False"-->
+            <dxb:BarManager.Items>
+                <dxb:BarButtonItem x:Name="itemCurrent" Content="Current Tasks" ItemClick="itemCurrent_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemHistory" Content="Tasks History" ItemClick="itemHistory_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemSubmit" Content="Submit Tasks" ItemClick="itemSubmit_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemRecover" Content="Recover Tasks" ItemClick="itemRecover_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemMove" Content="Move To Present" ItemClick="itemMove_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemMoveBack" Content="Move Back" ItemClick="itemMoveBack_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemAddNotes" Content="Add Notes to Task" ItemClick="itemAddNotes_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+
+                <dxb:BarButtonItem x:Name="itemClockHistory" Content="Past Clock Readings" ItemClick="itemClockReadingHistory_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemClockCurrent" Content="Current Clocks" ItemClick="itemClockReadingCurrent_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemUserClocks" Content="Enter Clock Readings" ItemClick="itemUserClocks_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemChangeClock" Content="Change Clock" ItemClick="itemChangeClock_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemChangeEquipment" Content="Change Equipment" ItemClick="itemChangeEquipment_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemDataTransfer" Content="Data Transfer" ItemClick="itemDataTransfer_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemEquipmentList" Content="Equipment List" ItemClick="itemEquipmentList_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+
+                <dxb:BarButtonItem x:Name="itemReSubmitData" Content="Re Submit Data" ItemClick="itemReSubmitData_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemFeedBack" Content="Feedback" ItemClick="itemFeedBack_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemModificationLog" Content="Modification Log" ItemClick="itemModificationLog_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemChngPastClockReading" Content="Change Past Clock Reading" ItemClick="itemChngPastClockReading_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemPastEquipmentHours" Content="Past Equipment Hours" ItemClick="itemPastEquipmentHours_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+
+                <dxb:BarCheckItem x:Name="itemPrintMarkedTasks" Content="Print Tasks Marked as Print" ItemClick="itemPrintMarkedTasks_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemPrePostDiveChecklist" Content="PrePost Dive Checklist" ItemClick="itemPrePostDiveChecklist_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemTaskDone" Content="Tasks Done" ItemClick="itemTaskDone_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemMissed" Content="Tasks Missed" ItemClick="itemMissed_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemWeeklyTasks" Content="Weekly Tasks" ItemClick="itemWeeklyTasks_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemBiweeklyTasks" Content="Bi-Weekly Tasks" ItemClick="itemBiweeklyTasks_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemMaintPlanByCateg" Content="Sorted by Category" ItemClick="itemMaintPlanByCateg_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemMaintPlanByFreq" Content="Sorted by Frequency" ItemClick="itemMaintPlanByFreq_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemRemobilsation" Content="Task for System (Re)Mobilsation" ItemClick="itemRemobilsation_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarCheckItem x:Name="itemPrintEquipmentHistory" Content="Print Equipment History" ItemClick="itemPrintEquipmentHistory_ItemClick"></dxb:BarCheckItem>
+                <dxb:BarSubItem x:Name="menuClock" GlyphAlignment="Top">
+                    <dxb:BarSubItem.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Image Height="35" />
+                                <TextBlock Text="Clock" Grid.Row="1" HorizontalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </dxb:BarSubItem.ContentTemplate>
+                    <dxb:BarSubItem.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemClockHistory" />
+                        <dxb:BarCheckItemLink BarItemName="itemClockCurrent" />
+                        <dxb:BarCheckItemLink BarItemName="itemUserClocks" />
+                        <dxb:BarCheckItemLink BarItemName="itemChangeClock" />
+                        <dxb:BarCheckItemLink BarItemName="itemChngPastClockReading" />
+                    </dxb:BarSubItem.ItemLinks>
+                </dxb:BarSubItem>
+                <dxb:BarSubItem x:Name="menuEquipment" GlyphAlignment="Top">
+                    <dxb:BarSubItem.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Image Height="35" />
+                                <TextBlock Text="Equipment" Grid.Row="1" HorizontalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </dxb:BarSubItem.ContentTemplate>
+                    <dxb:BarSubItem.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemChangeEquipment" />
+                        <dxb:BarButtonItemLink BarItemName="itemPastEquipmentHours" />
+                        <dxb:BarCheckItemLink BarItemName="itemDataTransfer" />
+                        <dxb:BarCheckItemLink BarItemName="itemEquipmentList" />
+                    </dxb:BarSubItem.ItemLinks>
+                </dxb:BarSubItem>
+                <dxb:BarSubItem x:Name="menuPrint" GlyphAlignment="Top" ToolTip="Print Preview">
+                    <dxb:BarSubItem.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Image Height="35" />
+                                <TextBlock Text="Print Preview" Grid.Row="1" HorizontalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </dxb:BarSubItem.ContentTemplate>
+                    <dxb:BarSubItem.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemPrintMarkedTasks" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                        <dxb:BarButtonItemLink BarItemName="itemPrePostDiveChecklist" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                        <dxb:BarSubItemLink BarItemName="menuPrintPastTask" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarSubItemLink BarItemName="menuPrintTaskDtl" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarSubItemLink BarItemName="menuMaintPlan" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemRemobilsation" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                        <dxb:BarButtonItemLink BarItemName="itemPrintEquipmentHistory" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+
+                    </dxb:BarSubItem.ItemLinks>
+                </dxb:BarSubItem>
+                <dxb:BarSubItem x:Name="menuPrintPastTask" Content="Print Past Task" GlyphAlignment="Top" GlyphSize="Large">
+                    <dxb:BarSubItem.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemTaskDone" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                        <dxb:BarButtonItemLink BarItemName="itemMissed" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                    </dxb:BarSubItem.ItemLinks>
+                </dxb:BarSubItem>
+                <dxb:BarSubItem x:Name="menuPrintTaskDtl" Content="Print Task Detail" GlyphAlignment="Top" GlyphSize="Large">
+                    <dxb:BarSubItem.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemWeeklyTasks" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                        <dxb:BarButtonItemLink BarItemName="itemBiweeklyTasks" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                    </dxb:BarSubItem.ItemLinks>
+                </dxb:BarSubItem>
+                <dxb:BarSubItem x:Name="menuMaintPlan" Content="Complete Maintenance Plan" GlyphAlignment="Top" GlyphSize="Large">
+                    <dxb:BarSubItem.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemMaintPlanByCateg" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                        <dxb:BarButtonItemLink BarItemName="itemMaintPlanByFreq" BarItemDisplayMode="Content"></dxb:BarButtonItemLink>
+                    </dxb:BarSubItem.ItemLinks>
+                </dxb:BarSubItem>
+
+                <dxb:BarButtonItem x:Name="itemClose" Content="Close" ItemClick="itemClose_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+                <dxb:BarButtonItem x:Name="itemHelp" Content="Help" ItemClick="itemHelp_ItemClick" GlyphAlignment="Top" GlyphSize="Large"></dxb:BarButtonItem>
+            </dxb:BarManager.Items>
+
+            <dxb:BarManager.Bars>
+                <dxb:Bar x:Name="barMainMenu" Caption="Main Menu" IsMainMenu="True" BarItemHorzIndent="2" AllowQuickCustomization="False">
+                    <dxb:Bar.DockInfo>
+                        <dxb:BarDockInfo ContainerType="Top" Row="0" />
+                    </dxb:Bar.DockInfo>
+                    <dxb:Bar.ItemLinks>
+                        <dxb:BarButtonItemLink BarItemName="itemHistory" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemCurrent" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarButtonItemLink BarItemName="itemSubmit" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemRecover" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemMove" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemMoveBack" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemAddNotes" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarSubItemLink BarItemName="menuClock" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarSubItemLink BarItemName="menuEquipment" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarButtonItemLink BarItemName="itemFeedBack" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemModificationLog" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarButtonItemLink BarItemName="itemReSubmitData" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarSubItemLink BarItemName="menuPrint" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarButtonItemLink BarItemName="itemHelp" BarItemDisplayMode="ContentAndGlyph" />
+                        <dxb:BarItemLinkSeparator></dxb:BarItemLinkSeparator>
+                        <dxb:BarButtonItemLink BarItemName="itemClose" BarItemDisplayMode="ContentAndGlyph" />
+                    </dxb:Bar.ItemLinks>
+                </dxb:Bar>
+            </dxb:BarManager.Bars>
+        </dxb:BarManager>
+        <!--Layout -->
+        <dxdo:DockLayoutManager Grid.Row="1" Height="Auto" Name="dockLayoutManager1" dxcore:ThemeManager.ThemeName="Office2007Blue"  
+                                 
+                                AllowCustomization="False" HorizontalAlignment="Left">
+            <!--AllowDrop="False"-->
+            <dxdo:LayoutGroup x:Name="Root" Orientation="Horizontal" ShowCaption="False">
+                <!--AllowMove="False"-->
+                <dxdo:LayoutGroup Orientation="Vertical" AllowFloat="False" ShowCaption="False" ItemWidth="3*">
+                    <dxdo:TabbedGroup x:Name="mainTab" SelectedTabIndex="1" ShowCaption="False" AllowFloat="False" ItemHeight="2*">
+                        <!--AllowMove="False"-->
+
+                        <!--"Task History" Tab-->
+                        <dxdo:LayoutPanel ShowCaption="False" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          AllowMove="False" ItemHeight="570">
+                            <dxdo:LayoutGroup Orientation="Vertical" ShowCaption="False" AllowFloat="False" Margin="0" ItemHeight="Auto">
+                                <!--AllowMove="False"-->
+                                <dxdo:LayoutControlItem Margin="0" ShowCaption="False" ItemWidth="Auto">
+                                    <Grid Margin="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="48"></RowDefinition>
+                                            <RowDefinition Height="20"></RowDefinition>
+                                            <RowDefinition Height="*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <dxdo:DockLayoutManager Grid.Row="0">
+                                            <dxdo:LayoutGroup Orientation="Horizontal" Caption="Filter Task History"  
+                                              ShowCaption="True" GroupBorderStyle="Group" CaptionAlignMode="AutoSize" Margin="0" ItemWidth="Auto" ItemHeight="Auto">
+                                                <!--AllowMove="False"-->
+                                                <dxdo:LayoutControlItem Caption="Done">
+                                                    <CheckBox x:Name="chk_doneHistory" IsChecked="False"></CheckBox>
+                                                </dxdo:LayoutControlItem>
+                                                <dxdo:LayoutControlItem Caption="Missed">
+                                                    <CheckBox x:Name="chk_missedHistory" IsChecked="False"></CheckBox>
+                                                </dxdo:LayoutControlItem>
+                                                <dxdo:LayoutControlItem Caption="Moved">
+                                                    <CheckBox x:Name="chk_movedHistory" IsChecked="False"></CheckBox>
+                                                </dxdo:LayoutControlItem>
+                                                <dxdo:LayoutControlItem Caption="Rescheduled">
+                                                    <CheckBox x:Name="chk_rescheduledHistory" IsChecked="False"></CheckBox>
+                                                </dxdo:LayoutControlItem>
+                                            </dxdo:LayoutGroup>
+                                        </dxdo:DockLayoutManager>
+                                        <dxdo:DockLayoutManager Grid.Row="1">
+                                            <dxdo:LayoutGroup Orientation="Horizontal" Margin="0,2,0,0" ItemWidth="0.5*" ItemHeight="Auto">
+                                                <!--AllowMove="False"-->
+                                                <dxdo:LayoutControlItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label>Legend:</Label>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="White" HorizontalAlignment="Left" Margin="0,0,3,0"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Done Tasks</Label>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="LightSalmon" HorizontalAlignment="Left" Margin="0,0,3,0"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Missed Tasks</Label>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="LightGreen" HorizontalAlignment="Left" Margin="0,0,3,0"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Moved Tasks</Label>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="Thistle" HorizontalAlignment="Left" Margin="0,0,3,0"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Rescheduled Tasks</Label>
+                                                        </StackPanel>
+
+                                                    </StackPanel>
+                                                </dxdo:LayoutControlItem>
+                                            </dxdo:LayoutGroup>
+                                        </dxdo:DockLayoutManager>
+                                        <dxg:GridControl x:Name="historyGrid" Width="933" Grid.Row="2" Height="498" Margin="0,2,0,0"
+                                            ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Stretch"
+                                            AutoPopulateColumns="False" 
+                                               
+                                             >
+                                            <dxg:GridControl.Columns>
+                                                <dxg:GridColumn FieldName="lng_SysTaskId" Visible="False" AllowEditing="False" AllowMoving="False">ID</dxg:GridColumn>
+                                                <dxg:GridColumn Width="35" FieldName="lng_TaskID" AllowEditing="False" AllowMoving="False" Fixed="Left">ID</dxg:GridColumn>
+                                                <dxg:GridColumn Width="200" FieldName="str_Title" AllowEditing="False" AllowMoving="False">Title</dxg:GridColumn>
+                                                <dxg:GridColumn Width="100" FieldName="str_FreqName" AllowEditing="False" AllowMoving="False">Freq.</dxg:GridColumn>
+                                                <dxg:GridColumn Width="70" FieldName="str_Name" AllowEditing="False" AllowMoving="False">Clock</dxg:GridColumn>
+                                                <dxg:GridColumn Width="70" FieldName="str_Status" AllowEditing="False" AllowMoving="False">Status</dxg:GridColumn>
+                                                <dxg:GridColumn Width="75" FieldName="dte_DateActioned" EditSettings="{dxe:DateSettings DisplayFormat=dd-MMM-yyyy}" AllowEditing="False" AllowMoving="False">Done/Act</dxg:GridColumn>
+                                                <dxg:GridColumn Width="70" FieldName="lng_Hours" AllowEditing="False">Done(hrs)</dxg:GridColumn>
+                                                <dxg:GridColumn Width="70" FieldName="lng_EstHours" AllowEditing="False">Est(hrs)</dxg:GridColumn>
+                                                <dxg:GridColumn Width="80" FieldName="str_CategoryName" AllowEditing="False" AllowMoving="False">Category</dxg:GridColumn>
+                                                <!--<dxg:GridColumn Width="80" FieldName="str_EqName" AllowEditing="False" AllowMoving="False">Equipment</dxg:GridColumn>-->
+                                                <dxg:GridColumn Width="80" FieldName="str_MajoreEqName" AllowEditing="False" AllowMoving="False">Maj. Eq</dxg:GridColumn>
+                                                <dxg:GridColumn Width="80" FieldName="str_AssetNumber" AllowEditing="False" AllowMoving="False">Asset No.</dxg:GridColumn>
+                                            </dxg:GridControl.Columns>
+                                            <dxg:GridControl.View>
+                                                <dxg:TableView Name="viewHistory" AllowColumnFiltering="False" ShowGroupPanel="False" 
+                                                           
+                                                           DataRowTemplate="{StaticResource historyGridRowTemplate}" />
+                                            </dxg:GridControl.View>
+                                        </dxg:GridControl>
+                                    </Grid>
+                                </dxdo:LayoutControlItem>
+                            </dxdo:LayoutGroup>
+                        </dxdo:LayoutPanel>
+
+                        <!--"Current Tasks" Tab-->
+                        <dxdo:LayoutPanel ShowCaption="False" AllowClose="False" AllowMove="False" AllowFloat="False" AllowHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          ItemHeight="570">
+                            <dxdo:LayoutGroup Orientation="Vertical" ShowCaption="False" AllowFloat="False" Margin="0" ItemHeight="Auto">
+                                <!--AllowMove="False"-->
+                                <dxdo:LayoutControlItem ShowCaption="False" ItemWidth="Auto">
+                                    <Grid Margin="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="55"></RowDefinition>
+                                            <RowDefinition Height="20"></RowDefinition>
+                                            <RowDefinition Height="*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <dxdo:DockLayoutManager Grid.Row="0">
+                                            <dxdo:LayoutGroup Orientation="Horizontal" ShowCaption="False" Margin="0" ItemWidth="Auto" ItemHeight="Auto">
+                                                <!--AllowMove="False"-->
+                                                <dxdo:LayoutGroup Orientation="Horizontal" ShowCaption="True"  
+                                                  Caption="Show Tasks" GroupBorderStyle="Group" CaptionAlignMode="AutoSize" ItemWidth="Auto" ItemHeight="Auto">
+                                                    <!--AllowMove="False"-->
+                                                    <dxdo:LayoutControlItem CaptionAlignMode="AutoSize" ItemWidth="Auto">
+                                                        <!--AllowMove="False"-->
+                                                        <RadioButton x:Name="rdo_ViewTill" IsChecked="True" HorizontalAlignment="Right" GroupName="grpShowTask"></RadioButton>
+                                                    </dxdo:LayoutControlItem>
+                                                    <dxdo:LayoutControlItem Caption="Days ahead" CaptionAlignMode="AutoSize" CaptionLocation="Right" AllowMove="False" CaptionVerticalAlignment="Top">
+                                                        <!--AllowMove="False"-->
+                                                        <dxe:SpinEdit MinValue="1" Height="20" x:Name="spinEdit1" IsFloatValue="False" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" />
+                                                    </dxdo:LayoutControlItem>
+
+                                                    <dxdo:LayoutControlItem CaptionAlignMode="AutoSize" AllowMove="False" ItemWidth="Auto">
+                                                        <RadioButton x:Name="rdo_ViewRange" GroupName="grpShowTask"></RadioButton>
+                                                    </dxdo:LayoutControlItem>
+                                                    <dxdo:LayoutControlItem Caption="Tasks between" CaptionAlignMode="AutoSize" CaptionVerticalAlignment="Top" ItemWidth="Auto">
+                                                        <dxe:DateEdit Height="20" x:Name="startDateEdit" HorizontalAlignment="Left" VerticalAlignment="Top" ShowClearButton="False" Width="Auto" />
+                                                    </dxdo:LayoutControlItem>
+                                                    <dxdo:LayoutControlItem Caption="And" CaptionAlignMode="AutoSize" CaptionVerticalAlignment="Top" ItemWidth="Auto">
+                                                        <dxe:DateEdit Height="20" x:Name="endDateEdit" MinValue="{Binding ElementName=startDateEdit, Path=EditValue}" ShowClearButton="False" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" />
+                                                    </dxdo:LayoutControlItem>
+                                                </dxdo:LayoutGroup>
+                                                <dxdo:LayoutGroup CaptionAlignMode="AutoSize" AllowMove="False" Margin="0,2,0,0"
+                                                  ShowCaption="True"  
+                                                  Caption="Task Filters" GroupBorderStyle="Group" ItemWidth="Auto" ItemHeight="Auto">
+                                                    <dxdo:LayoutControlItem Caption="Due Tasks" CaptionAlignMode="AutoSize" CaptionVerticalAlignment="Top" ItemWidth="Auto">
+                                                        <CheckBox x:Name="dueTask" VerticalAlignment="Top"></CheckBox>
+                                                    </dxdo:LayoutControlItem>
+                                                    <dxdo:LayoutControlItem Caption="Expiring Tasks" CaptionAlignMode="AutoSize" CaptionVerticalAlignment="Top" ItemWidth="Auto">
+                                                        <CheckBox x:Name="warnTask" VerticalAlignment="Top"></CheckBox>
+                                                    </dxdo:LayoutControlItem>
+                                                    <dxdo:LayoutControlItem Caption="Missed Tasks" CaptionAlignMode="AutoSize" CaptionVerticalAlignment="Top" ItemWidth="Auto">
+                                                        <CheckBox x:Name="missedTasks" VerticalAlignment="Top"></CheckBox>
+                                                    </dxdo:LayoutControlItem>
+                                                </dxdo:LayoutGroup>
+                                            </dxdo:LayoutGroup>
+                                        </dxdo:DockLayoutManager>
+                                        <dxdo:DockLayoutManager Grid.Row="1">
+                                            <dxdo:LayoutGroup Orientation="Horizontal" AllowMove="False" ShowCaption="False" Margin="0,2,0,0" ItemWidth="0.5*" ItemHeight="Auto">
+                                                <dxdo:LayoutControlItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label>Legend:</Label>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="Khaki" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,3,0"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Tasks About to be Missed</Label>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="LightSalmon" HorizontalAlignment="Left" Margin="0,0,3,0" VerticalAlignment="Top"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Missed Tasks</Label>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="LightGreen" HorizontalAlignment="Left" Margin="0,0,3,0" VerticalAlignment="Top"></TextBox>
+                                                            <Label HorizontalAlignment="Center">Tasks Moved to Present</Label>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                                                            <TextBox Height="14" Width="14" Focusable="False" Background="Orange" HorizontalAlignment="Left" Margin="0,0,3,0" VerticalAlignment="Top"></TextBox>
+                                                            <Label HorizontalAlignment="Center" ToolTip="Submit all tasks that have been moved to present or move those to back to future, otherwise those will be marked as missed">Moved Tasks About to be Missed</Label>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </dxdo:LayoutControlItem>
+                                            </dxdo:LayoutGroup>
+                                        </dxdo:DockLayoutManager>
+                                        <dxg:GridControl Width="938" Grid.Row="2" Height="495" Margin="0,2,0,0"
+                                            x:Name="grid" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Stretch"
+                                            AutoPopulateColumns="False" 
+                                               
+                                             >
+                                            <dxg:GridControl.Columns>
+                                                <dxg:GridColumn FieldName="SysTaskId" Visible="False"></dxg:GridColumn>
+                                                <dxg:GridColumn Width="35" FieldName="ID" SortIndex="0" SortOrder="Ascending" Fixed="Left"></dxg:GridColumn>
+                                                <dxg:GridColumn Width="40" FieldName="UserInitials" AllowEditing="True" AllowMoving="False">Inits.
+                                                </dxg:GridColumn>
+                                                <dxg:GridColumn Width="43" FieldName="Submit" UnboundType="Boolean">
+                                                    <dxg:GridColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <!--IsEnabled="{Binding Data.IsDue}"-->
+                                                            <CheckBox IsChecked="{Binding Data.Submit}" IsEnabled="{Binding Data.IsDue}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </DataTemplate>
+                                                    </dxg:GridColumn.CellTemplate>
+                                                </dxg:GridColumn>
+                                                <dxg:GridColumn FieldName="Print" Width="38" UnboundType="Boolean">
+                                                    <dxg:GridColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox HorizontalAlignment="Center" IsChecked="{Binding Data.Print}" VerticalAlignment="Center" />
+                                                        </DataTemplate>
+                                                    </dxg:GridColumn.CellTemplate>
+                                                </dxg:GridColumn>
+                                                <dxg:GridColumn Width="197" FieldName="Title"></dxg:GridColumn>
+                                                <dxg:GridColumn Width="100" AllowEditing="False" FieldName="FreqName">
+                                                    <!--<dxg:GridColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding Data.TaskFrequency, Converter={StaticResource FrequencyToStringConverter} }"></TextBlock>
+                                                    </DataTemplate>
+                                                </dxg:GridColumn.CellTemplate>-->
+                                                    Frequency
+                                                </dxg:GridColumn>
+                                                <dxg:GridColumn Width="100" FieldName="Category"></dxg:GridColumn>
+                                                <dxg:GridColumn Width="73" FieldName="CurrentDue.DueDate.Date" EditSettings="{dxe:DateSettings DisplayFormat=dd-MMM-yyyy}">Due Date</dxg:GridColumn>
+                                                <dxg:GridColumn Width="73" FieldName="CurrentDue.ExpiryDate" EditSettings="{dxe:DateSettings DisplayFormat=dd-MMM-yyyy}">Exp Date</dxg:GridColumn>
+                                                <dxg:GridColumn Width="50" FieldName="CurrentDue.DueHours">Due Hrs</dxg:GridColumn>
+                                                <dxg:GridColumn Width="50" FieldName="CurrentDue.ExpiryHours">Exp Hrs</dxg:GridColumn>
+                                                <dxg:GridColumn Width="75" FieldName="LastActionDate" EditSettings="{dxe:DateSettings DisplayFormat=dd-MMM-yyyy}">Done/Act</dxg:GridColumn>
+                                                <dxg:GridColumn Width="45" FieldName="Attachments">Docs</dxg:GridColumn>
+                                                <dxg:GridColumn Width="70" FieldName="Clock"></dxg:GridColumn>
+                                                <dxg:GridColumn Width="Auto" FieldName="Equipment"></dxg:GridColumn>
+                                                <dxg:GridColumn Width="Auto" FieldName="MajorEquipment">Maj. Equipment</dxg:GridColumn>
+                                                <dxg:GridColumn Width="Auto" FieldName="MajorEquipmentAssetNumber">Maj.Eq. Asset No.</dxg:GridColumn>
+
+                                                <!--<dxg:GridColumn Width="55" FieldName="CurrentDue.WeekNumber" >Due Wk.</dxg:GridColumn>-->
+
+                                            </dxg:GridControl.Columns>
+                                            <dxg:GridControl.View>
+                                                <dxg:TableView Name="view" AllowEditing="False" 
+                                                           AllowMoving="False" ShowGroupPanel="False" 
+                                                           
+                                                           AllowSorting="True"  
+                                                          
+                                                           AllowColumnFiltering="False" NavigationStyle="Cell" 
+                                                           DataRowTemplate="{StaticResource gridRowTemplate}">
+                                                </dxg:TableView>
+                                            </dxg:GridControl.View>
+                                        </dxg:GridControl>
+                                    </Grid>
+                                </dxdo:LayoutControlItem>
+                            </dxdo:LayoutGroup>
+                        </dxdo:LayoutPanel>
+                    </dxdo:TabbedGroup>
+                    <dxdo:LayoutPanel Caption="Task Details" AllowClose="False" AllowSizing="False" 
+                                      AllowFloat="False" AllowMove="False" AllowDock="False" AllowHide="False"
+                                      ItemHeight="*">
+                        <dxdo:LayoutGroup Orientation="Horizontal" AllowMove="False" ItemHeight="Auto">
+                            <dxdo:LayoutGroup x:Name="TaskDetails" Orientation="Vertical" ShowCaption="True" 
+                                              GroupBorderStyle="Group" Caption="Task Details" AllowClose="False" AllowMove="False" 
+                                              AllowHide="False" ItemWidth="*">
+                                <dxdo:LayoutControlItem Caption="Major Equipment">
+                                    <dxe:TextEdit Focusable="False" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.MajorEquipment}"></dxe:TextEdit>
+                                </dxdo:LayoutControlItem>
+                                <dxdo:LayoutControlItem Caption="Equipment">
+                                    <dxe:TextEdit Focusable="False" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Equipment}"></dxe:TextEdit>
+                                </dxdo:LayoutControlItem>
+                                <dxdo:LayoutControlItem Caption="Category">
+                                    <dxe:TextEdit Focusable="False" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Category}"></dxe:TextEdit>
+                                </dxdo:LayoutControlItem>
+                                <dxdo:LayoutControlItem Caption="Clock">
+                                    <dxe:TextEdit Focusable="False" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Clock}"></dxe:TextEdit>
+                                </dxdo:LayoutControlItem>
+                                <dxdo:LayoutControlItem Caption="Over Due Days" x:Name="lci_overDueDays">
+                                    <dxe:TextEdit x:Name="te_overDueDays" Foreground="Red"></dxe:TextEdit>
+                                    <!--<dxe:TextEdit  Foreground="Red" Focusable="False"  Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.OverdueStats.DaysOverDue}"></dxe:TextEdit>-->
+                                </dxdo:LayoutControlItem>
+                                <dxdo:LayoutControlItem Caption="Over Due Hours" Name="lci_overDueHours">
+                                    <dxe:TextEdit x:Name="te_overDueHours" Foreground="Red"></dxe:TextEdit>
+                                    <!--<dxe:TextEdit  Foreground="Red" Focusable="False"  Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.OverdueStats.HoursOverDue}"></dxe:TextEdit>-->
+                                </dxdo:LayoutControlItem>
+
+                                <!--<dxdo:LayoutControlItem Caption="Attachments">
+                                    <dxg:GridControl Control.MouseDoubleClick="dxgrid_attachments_MouseDoubleClick" x:Name="dxgrid_attachments" Height="100" Width="Auto">
+                                        <dxg:GridControl.Columns>
+                                            <dxg:GridColumn FieldName="str_AttachmentName" AllowEditing="False">Task Attachments</dxg:GridColumn>
+                                        </dxg:GridControl.Columns>
+                                        <dxg:GridControl.View>
+                                            <dxg:TableView ShowGroupPanel="False" AllowGrouping="False"></dxg:TableView>
+                                        </dxg:GridControl.View>
+                                    </dxg:GridControl>
+                                </dxdo:LayoutControlItem>-->
+                            </dxdo:LayoutGroup>
+                            <dxdo:LayoutGroup x:Name="lg_scheduleDetails" Orientation="Vertical" ShowCaption="True" 
+                                              AllowMove="False" 
+                                              GroupBorderStyle="Group" Caption="Schedule Details " AllowClose="False" AllowHide="False" ItemWidth="1.2*" ItemHeight="Auto">
+                                <dxdo:LayoutGroup Orientation="Horizontal" CaptionAlignMode="AutoSize" AllowMove="False" ItemHeight="Auto">
+                                    <dxdo:LayoutControlItem x:Name="lci_SysTaskID" Visibility="Collapsed">
+                                        <!--IsEnabled="False"-->
+                                        <dxe:TextEdit x:Name="SysTaskIdTextEdit" Width="50" IsEnabled="False" Focusable="False" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.SysTaskId}">
+                                        </dxe:TextEdit>
+                                    </dxdo:LayoutControlItem>
+                                    <dxdo:LayoutControlItem x:Name="lci_taskID" Caption="Task ID" CaptionAlignMode="AutoSize">
+                                        <!--IsEnabled="False"-->
+                                        <dxe:TextEdit x:Name="taskIDTextEdit" Width="50" IsEnabled="False" Focusable="False" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.ID}">
+                                        </dxe:TextEdit>
+                                    </dxdo:LayoutControlItem>
+                                    <dxdo:LayoutControlItem x:Name="lci_startDate" Caption="Start Date">
+                                        <dxe:DateEdit x:Name="sd_startDateEdit" DateTime="{Binding ElementName=startDateEdit, Path=DateTime, Mode=OneWay}"></dxe:DateEdit>
+                                    </dxdo:LayoutControlItem>
+                                    <dxdo:LayoutControlItem x:Name="lci_endDate" Caption="End Date">
+                                        <dxe:DateEdit x:Name="sd_endDateEdit" MinValue="{Binding ElementName=sd_startDateEdit, Path=MinValue}" DateTime="{Binding ElementName=endDateEdit, Path=DateTime, Mode=OneWay}"></dxe:DateEdit>
+                                    </dxdo:LayoutControlItem>
+                                </dxdo:LayoutGroup>
+                                <dxdo:LayoutGroup>
+                                    <dxdo:LayoutControlItem CaptionAlignMode="AutoSize" AllowMove="False" ItemHeight="*">
+                                        <dxg:GridControl x:Name="scheduleGrid" Margin="0,3,10,3" 
+                                                         AutoPopulateColumns="False" DataSource="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Schedule}">
+                                            <dxg:GridControl.Columns>
+                                                <dxg:GridColumn FieldName="WeekNumber">Week No.</dxg:GridColumn>
+                                                <dxg:GridColumn FieldName="Reading.CalanderValue.Date">Due On</dxg:GridColumn>
+                                                <dxg:GridColumn FieldName="ExpiryDate" EditSettings="{dxe:DateSettings DisplayFormat=dd-MMM-yyyy}">Expires On</dxg:GridColumn>
+                                                <dxg:GridColumn FieldName="Reading.HourlyValue">Due Hrs</dxg:GridColumn>
+                                                <dxg:GridColumn FieldName="ExpiryHours">Expiry Hrs</dxg:GridColumn>
+                                            </dxg:GridControl.Columns>
+                                            <dxg:GridControl.View>
+                                                <dxg:TableView NavigationStyle="Row" AllowMoving="False" ShowGroupPanel="False" />
+                                            </dxg:GridControl.View>
+                                        </dxg:GridControl>
+                                    </dxdo:LayoutControlItem>
+                                </dxdo:LayoutGroup>
+
+                            </dxdo:LayoutGroup>
+                        </dxdo:LayoutGroup>
+                    </dxdo:LayoutPanel>
+                </dxdo:LayoutGroup>
+                <dxdo:LayoutGroup Orientation="Vertical" AllowClose="False" AllowMove="False" AllowSizing="False" ItemWidth="*">
+                    <dxdo:LayoutPanel x:Name="leftLayoutPanel" Margin="0,0,0,0" Caption="Description" AllowDock="False" AllowHide="False"
+                                      AllowClose="False" AllowFloat="False" AllowMove="False" ItemWidth="310">
+                        <Grid x:Name="leftPanelGrid">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <!--<RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>-->
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <!--Visibility="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Missed, Converter={StaticResource BoolToVisibleConverter}}"-->
+                            <Label Grid.Row="0" Name="lblReasonMissed" Visibility="Collapsed">Reason task was missed:</Label>
+                            <Label Grid.Row="0" Name="lblReasonMissedHistory" Visibility="Collapsed">Reason task was missed:</Label>
+                            <Label Grid.Row="2">Procedure</Label>
+                            <!--<Label Grid.Row="2" Visibility="Collapsed">Feedback</Label>-->
+                            <Label Grid.Row="4">Enter Data for this Task(Mandatory Fields)</Label>
+                            <Label Grid.Row="6">Notes</Label>
+                            <Label Grid.Row="8">Attached Documents</Label>
+
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <TextBox Grid.Row="0" x:Name="txt_reasonMissed" Height="40" Margin="5,0,0,5"  
+                                     Visibility="Collapsed" 
+                                     Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.ReasonMissed}" 
+                                     VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto"
+                                     HorizontalAlignment="Stretch" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+                                <Button Grid.Row="1" Height="Auto" Width="150" x:Name="btnReasonApplyAll" Visibility="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Missed, Converter={StaticResource BoolToVisibleConverter}}"
+                                    FontWeight="Bold">Apply to all missed tasks
+                                    <Button.BorderBrush>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="Blue" Offset="0" />
+                                            <GradientStop Color="Red" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Button.BorderBrush>
+                                </Button>
+                            </Grid>
+                            <!--Text="{Binding ElementName=historyGrid, Path=View.FocusedRowData.DataContext.str_ReasonMissed}"-->
+                            <TextBox Grid.Row="1" x:Name="txt_reasonMissedHistory" Height="40" Margin="5,0,0,5" Visibility="Collapsed" 
+                                     
+                                     VerticalAlignment="Stretch" Focusable="False" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                     HorizontalAlignment="Stretch" AcceptsReturn="True"></TextBox>
+
+                            <TextBox x:Name="txt_Description" Grid.Row="3" Margin="5,0,0,5" Focusable="False" VerticalScrollBarVisibility="Auto"
+                                     TextWrapping="Wrap" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Description}"></TextBox>
+                            <!--Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.Description}"-->
+                            <TextBox x:Name="txt_Description2" Grid.Row="3" Margin="5,0,0,5" Visibility="Collapsed" 
+                                     
+                                     Text="{Binding ElementName=historyGrid, Path=View.FocusedRowData.DataContext.str_Clauses}" Focusable="False" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                     ></TextBox>
+
+                            <!--<TextBox x:Name="txt_Feedback" Grid.Row="3" Visibility="Collapsed" Margin="5,0,0,5" Text="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.TaskFeedBack}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="Wrap" AcceptsReturn="True" ></TextBox>
+                            <TextBox x:Name="txt_Feedback2" Grid.Row="3" Visibility="Collapsed" Margin="5,0,0,5" Text="{Binding ElementName=historyGrid, Path=View.FocusedRowData.DataContext.str_feedback}" Focusable="False"></TextBox>-->
+
+                            <Border Grid.Row="5" Name="dxgrid_AttachedFieldsBorder" Background="Transparent">
+                                <dxg:GridControl x:Name="dxgrid_AttachedFields" Margin="5,0,0,5" Width="Auto" 
+                                             DataSource="{Binding ElementName=grid, Path=View.FocusedRowData.DataContext.AttachedFields}">
+                                    <dxg:GridControl.Columns>
+                                        <dxg:GridColumn FieldName="FieldName" AllowEditing="False" Width="100"></dxg:GridColumn>
+                                        <dxg:GridColumn FieldName="Value" AllowEditing="True" Width="80"></dxg:GridColumn>
+                                        <dxg:GridColumn FieldName="UOM" AllowEditing="False" Width="80"></dxg:GridColumn>
+                                    </dxg:GridControl.Columns>
+                                    <dxg:GridControl.View>
+                                        <dxg:TableView ShowGroupPanel="False" Name="tblVwAttachedFld" AllowMoveColumnToDropArea="False" AllowMoving="False"></dxg:TableView>
+                                    </dxg:GridControl.View>
+                                </dxg:GridControl>
+                            </Border>
+
+                            <dxg:GridControl Grid.Row="5" x:Name="dxgrid_AttachedFields2" Margin="5,0,0,5" Width="Auto">
+                                <!--DataSource="{Binding ElementName=historyGrid, Path=View.FocusedRowData.DataContext.AttachedFieldData}"-->
+                                <dxg:GridControl.Columns>
+                                    <dxg:GridColumn FieldName="str_FieldName" AllowEditing="False" Width="100">Field Name</dxg:GridColumn>
+                                    <dxg:GridColumn FieldName="str_Value" AllowEditing="False" Width="80">Value</dxg:GridColumn>
+                                    <dxg:GridColumn FieldName="str_UOM" AllowEditing="False" Width="80">UOM</dxg:GridColumn>
+                                </dxg:GridControl.Columns>
+                                <dxg:GridControl.View>
+                                    <dxg:TableView ShowGroupPanel="False" AllowMoveColumnToDropArea="False" AllowMoving="False"></dxg:TableView>
+                                </dxg:GridControl.View>
+                            </dxg:GridControl>
+
+                            <Grid Grid.Row="7">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <dxg:GridControl Grid.Row="0" x:Name="dxgrid_Notes" Margin="5,0,0,5">
+                                    <dxg:GridControl.Columns>
+                                        <dxg:GridColumn FieldName="dte_Date" AllowEditing="False" Width="80">
+                                            <dxg:GridColumn.EditSettings>
+                                                <dxe:DateEditSettings DisplayFormat="dd-MMM-yyyy" VerticalContentAlignment="Top"></dxe:DateEditSettings>
+
+                                            </dxg:GridColumn.EditSettings>
+                                            Date
+                                        </dxg:GridColumn>
+                                        <dxg:GridColumn AllowEditing="False" FieldName="str_Notes" Width="190">Notes</dxg:GridColumn>
+                                    </dxg:GridControl.Columns>
+                                    <dxg:GridControl.View>
+                                        <dxg:TableView ShowGroupPanel="False" AllowGrouping="False"  
+                                                       AllowResizing="False" AllowMoving="False" VerticalContentAlignment="Top"></dxg:TableView>
+                                    </dxg:GridControl.View>
+                                </dxg:GridControl>
+                            </Grid>
+                            <dxg:GridControl Grid.Row="9" x:Name="dxgrid_attachments" Width="Auto">
+                                <dxg:GridControl.Columns>
+                                    <dxg:GridColumn FieldName="str_AttachmentName" AllowEditing="False" Width="250">Task Attachments</dxg:GridColumn>
+                                </dxg:GridControl.Columns>
+                                <dxg:GridControl.View>
+                                    <dxg:TableView ShowGroupPanel="False" AllowGrouping="False" AllowMoveColumnToDropArea="False" AllowMoving="False"></dxg:TableView>
+                                </dxg:GridControl.View>
+                            </dxg:GridControl>
+                        </Grid>
+                    </dxdo:LayoutPanel>
+                </dxdo:LayoutGroup>
+            </dxdo:LayoutGroup>
+        </dxdo:DockLayoutManager>
+
+    </Grid>
+</Window>

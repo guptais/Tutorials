@@ -1,0 +1,41 @@
+﻿@using Entities;
+@model CourseInstitution
+
+@{
+    ViewBag.Title = "Institution";
+}
+
+<hr />
+<b>Course Details</b>
+<hr />
+
+Course ID : @(Model.Course.CourseID)
+
+<hr />
+
+Institution Name : @(Model.Course.Title)
+
+<hr />
+
+Institution Address : @(Model.Course.Description)
+
+<hr />
+<b>Institution Details</b>
+<hr />
+
+Institution ID : @(Model.Institution.InstitutionID)
+
+<hr />
+
+Institution Name : @(Model.Institution.Name)
+
+<hr />
+
+Institution Address : @(Model.Institution.Address)
+
+<hr />
+
+Institution Telephone : @(Model.Institution.Telephone)
+
+
+

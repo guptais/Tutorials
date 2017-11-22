@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityWebApplication", "UnityWebApplication\UnityWebApplication.csproj", "{F90F3873-83A8-4DE6-98B2-75C4F7B751F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{A765474C-07D0-4E4F-A268-4D0A12991C28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{BCAADFF6-692E-44E5-8811-15B21616AB9F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F90F3873-83A8-4DE6-98B2-75C4F7B751F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F90F3873-83A8-4DE6-98B2-75C4F7B751F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F90F3873-83A8-4DE6-98B2-75C4F7B751F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F90F3873-83A8-4DE6-98B2-75C4F7B751F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A765474C-07D0-4E4F-A268-4D0A12991C28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A765474C-07D0-4E4F-A268-4D0A12991C28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A765474C-07D0-4E4F-A268-4D0A12991C28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A765474C-07D0-4E4F-A268-4D0A12991C28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCAADFF6-692E-44E5-8811-15B21616AB9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCAADFF6-692E-44E5-8811-15B21616AB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCAADFF6-692E-44E5-8811-15B21616AB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCAADFF6-692E-44E5-8811-15B21616AB9F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
